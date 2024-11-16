@@ -11,7 +11,7 @@ plugins {
 
 group = "net.mvndicraft"
 version = "1.0.0-SNAPSHOT"
-description = "A plugin template in kotlin."
+description = "Misc stuff for mvndi"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 val mvndiRemote = repositories.maven("https://repo.mvndicraft.net/repository/maven-snapshots/") {
@@ -37,6 +37,8 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
+    compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")

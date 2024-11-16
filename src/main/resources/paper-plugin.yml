@@ -5,3 +5,8 @@ api-version: '1.21'
 authors: [ tlm920 ]
 description: Core plugin for minigame management on Mvndicraft
 website: mvndicraft.net
+dependencies:
+  server:
+    MvndiEquipment:
+      load: BEFORE
+      required: true
