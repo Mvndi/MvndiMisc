@@ -8,9 +8,8 @@ import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
-import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 
 class MvndiMisc : JavaPlugin(), Listener {
@@ -35,12 +34,19 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onItemFrameBreak(event: EntityDeathEvent) {
+    fun onItemFrameBreak(event: HangingBreakByEntityEvent) {
         val entity = event.entity
 
         if (entity is ItemFrame && !entity.isVisible) {
-            event.drops.clear()
-            event.drops[0] = ItemManager.getInstance().create("invisible_item_frame", 1)
+            entity.remove()
+            val heldItem = entity.item
+            entity.world.dropItem(entity.location, heldItem)
+
+            val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1);
+            if (toDrop != null) {
+                entity.world.dropItem(entity.location, toDrop)
+            }
+            event.isCancelled = false
         }
     }
 
