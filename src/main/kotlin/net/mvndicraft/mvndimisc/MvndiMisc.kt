@@ -2,6 +2,9 @@ package net.mvndicraft.mvndimisc
 
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.ItemManager
+import net.mvndicraft.mvndiseasons.MvndiSeasonsPlugin
+import net.mvndicraft.mvndiseasons.biomes.MSBiome.MSBiomeBuilder
+import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.ItemFrame
@@ -57,9 +60,22 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
+
         val p = event.player
-        if (p.gameMode != GameMode.CREATIVE && p.location.block.biome.name.lowercase().contains("ocean")) {
+        val biomeName = p.location.block.biome.name.lowercase()
+
+        if (p.gameMode != GameMode.CREATIVE && (biomeName.contains("ocean") || NMSBiomeUtils.getBiomeKeyString(p.location).contains("ocean"))) {
             p.sendMessage("No building in ocean")
+            event.isCancelled = true
+        }
+
+        if (p.location.y <= -60) {
+            p.sendMessage("No building this far underground")
+            event.isCancelled = true
+        }
+
+        if (p.location.y >= 256) {
+            p.sendMessage("No building this far up")
             event.isCancelled = true
         }
     }

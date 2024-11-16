@@ -11,3 +11,6 @@ dependencies:
     MvndiEquipment:
       load: BEFORE
       required: true
+    MvndiSeasons:
+      load: BEFORE
+      required: true
