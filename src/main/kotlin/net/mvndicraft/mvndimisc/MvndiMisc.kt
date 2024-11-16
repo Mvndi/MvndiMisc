@@ -6,17 +6,22 @@ import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class MvndiMisc : JavaPlugin(), Listener {
+
+    private val playersInChests = HashSet<Player>()
 
     override fun onEnable() {
         // Plugin startup logic
@@ -103,6 +108,19 @@ class MvndiMisc : JavaPlugin(), Listener {
         if (event.player.inventory.storageContents.any{ itemStack -> itemStack.toString().lowercase().contains("shulker") }) {
             event.player.sendMessage("Cannot open storage blocks with shulker in inventory")
             event.isCancelled = true
+        } else {
+            playersInChests.add(event.player)
         }
+    }
+
+    @EventHandler
+    fun removePlayerFromPlayersInChests(event: InventoryCloseEvent) {
+        playersInChests.remove(event.player)
+    }
+
+    @EventHandler
+    fun noPickupShulkerIfNearChest(event: PlayerAttemptPickupItemEvent) {
+        if (event.item.itemStack.type.toString().lowercase().contains("shulker") && playersInChests.contains(event.player))
+            event.isCancelled = true
     }
 }
