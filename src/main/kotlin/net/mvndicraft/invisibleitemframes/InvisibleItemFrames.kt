@@ -44,9 +44,6 @@ class InvisibleItemFrames : JavaPlugin(), Listener {
 
     @EventHandler
     fun equipmentReload(event: ReloadConfigEvent) {
-        if (!ItemManager.getInstance().itemExists("invisible_item_frame")) {
-            this.isEnabled = false
-        } else
-            this.isEnabled = true
+        this.isEnabled = ItemManager.getInstance().itemExists("invisible_item_frame")
     }
 }

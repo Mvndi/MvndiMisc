@@ -1,3 +1,3 @@
-# invisible item frames
+# MvndiMisc
 
-Invisible item frames for mvndi
+Misc stuff for mvndi
