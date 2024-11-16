@@ -2,17 +2,18 @@ package net.mvndicraft.mvndimisc
 
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.ItemManager
-import net.mvndicraft.mvndiseasons.MvndiSeasonsPlugin
-import net.mvndicraft.mvndiseasons.biomes.MSBiome.MSBiomeBuilder
 import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
+import org.bukkit.event.inventory.InventoryMoveItemEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class MvndiMisc : JavaPlugin(), Listener {
@@ -45,7 +46,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             val heldItem = entity.item
             entity.world.dropItem(entity.location, heldItem)
 
-            val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1);
+            val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1)
             if (toDrop != null) {
                 entity.world.dropItem(entity.location, toDrop)
             }
@@ -76,6 +77,31 @@ class MvndiMisc : JavaPlugin(), Listener {
 
         if (p.location.y >= 256) {
             p.sendMessage("No building this far up")
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun noShulkerInChestHopper(event: InventoryMoveItemEvent) {
+        val typeLC = event.destination.type.toString().lowercase()
+        if (!typeLC.contains("chest") && !typeLC.contains("shulker"))
+            return
+
+        if (event.item.toString().lowercase().contains("shulker"))
+            event.isCancelled = true
+    }
+
+    @EventHandler
+    fun noShulkerInChest(event: PlayerInteractEvent) {
+        if (event.action != Action.RIGHT_CLICK_BLOCK)
+            return
+
+        val block = event.clickedBlock
+        if (block == null || !block.type.toString().lowercase().contains("chest"))
+            return
+
+        if (event.player.inventory.storageContents.any{ itemStack -> itemStack.toString().lowercase().contains("shulker") }) {
+            event.player.sendMessage("Cannot open storage blocks with shulker in inventory")
             event.isCancelled = true
         }
     }
