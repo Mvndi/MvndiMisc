@@ -19,6 +19,7 @@ val mvndiRemote = repositories.maven("https://repo.mvndicraft.net/repository/mav
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 
     // Paper
@@ -26,6 +27,9 @@ repositories {
 
     // Kotlin
     maven("https://oss.sonatype.org/content/groups/public/")
+
+    // towny
+    maven("https://repo.glaremasters.me/repository/towny/")
 
     // Mvndi
     mvndiRemote
@@ -37,6 +41,7 @@ dependencies {
     compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiseasons:0.8.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compileOnly("com.github.TownyAdvanced:towny:0.100.4.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.107.0")

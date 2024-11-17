@@ -123,4 +123,9 @@ class MvndiMisc : JavaPlugin(), Listener {
         if (event.item.itemStack.type.toString().lowercase().contains("shulker") && playersInChests.contains(event.player))
             event.isCancelled = true
     }
+
+    @EventHandler
+    fun dropShulkerInvOnBreak() {
+
+    }
 }
