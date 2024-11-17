@@ -7,24 +7,16 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ItemFrame
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryMoveItemEvent
-import org.bukkit.event.player.PlayerAttemptPickupItemEvent
-import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
 class MvndiMisc : JavaPlugin(), Listener {
-
-    private val playersInChests = HashSet<Player>()
 
     override fun onEnable() {
         // Plugin startup logic
@@ -73,9 +65,8 @@ class MvndiMisc : JavaPlugin(), Listener {
                     loc.world.dropItem(loc, item)
                 }
             }
-            blockstate.inventory.clear()
-            blockstate.update()
-            event.isDropItems = true
+            loc.world.dropItem(loc, ItemStack.of(block.type))
+            event.isDropItems = false
         }
     }
 
