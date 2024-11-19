@@ -5,14 +5,19 @@ import net.mvndicraft.mvndiequipment.ItemManager
 import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -95,5 +100,14 @@ class MvndiMisc : JavaPlugin(), Listener {
             p.sendMessage("No building this far up")
             event.isCancelled = true
         }
+    }
+
+    @EventHandler
+    fun onPlayyerInteract(e: PlayerInteractEvent) {
+        val b = e.clickedBlock
+        val item = e.item
+        if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
+        if (item.type == Material.BONE_MEAL && !b.type.toString().lowercase().contains("grass"))
+            e.isCancelled = true
     }
 }
