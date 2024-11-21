@@ -86,7 +86,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         val p = event.player
         val biomeName = p.location.block.biome.name.lowercase()
 
-        if (p.gameMode != GameMode.CREATIVE && (biomeName.contains("ocean") || NMSBiomeUtils.getBiomeKeyString(p.location).contains("ocean"))) {
+        if (p.gameMode != GameMode.CREATIVE && ((biomeName.contains("ocean") && biomeName.contains("deep")) || (NMSBiomeUtils.getBiomeKeyString(p.location).contains("ocean") && NMSBiomeUtils.getBiomeKeyString(p.location).contains("deep")))) {
             p.sendMessage("No building in ocean")
             event.isCancelled = true
         }
