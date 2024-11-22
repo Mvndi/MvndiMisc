@@ -14,6 +14,12 @@ dependencies:
     MvndiSeasons:
       load: BEFORE
       required: true
+    MvndiPlayers:
+      load: BEFORE
+      required: true
+    MvndiStats:
+      load: BEFORE
+      required: true
     Towny:
       load: BEFORE
       required: true

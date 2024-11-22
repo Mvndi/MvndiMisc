@@ -40,6 +40,8 @@ dependencies {
     compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiseasons:0.8.5-SNAPSHOT")
+    compileOnly("net.mvndicraft:mvndiplayers:2.0.0-SNAPSHOT")
+    compileOnly("net.mvndicraft:mvndistats:2.0.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")

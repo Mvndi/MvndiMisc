@@ -2,11 +2,12 @@ package net.mvndicraft.mvndimisc
 
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.ItemManager
+import net.mvndicraft.mvndiplayers.MvndiPlayer
+import net.mvndicraft.mvndiplayers.PlayerManager
 import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
@@ -17,9 +18,11 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
 class MvndiMisc : JavaPlugin(), Listener {
 
@@ -99,6 +102,22 @@ class MvndiMisc : JavaPlugin(), Listener {
         if (p.location.y >= 256) {
             p.sendMessage("No building this far up")
             event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onWalkOnIce(e: PlayerMoveEvent) {
+        val p = e.player
+        val b = p.location.subtract(0.0, 1.0, 0.0).block
+        if (!b.type.toString().lowercase().contains("ice"))
+            return
+
+        val mPlayer = Objects.requireNonNull<MvndiPlayer>(PlayerManager.getInstance().getPlayer(p.uniqueId))
+        val stats = mPlayer.stats
+        p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 0.05f, 1f)
+        if (mPlayer.equipLoad/stats.equipLoad > 0.75 && Random().nextFloat() <= 0.5f) {
+            b.type = Material.WATER
+            p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
         }
     }
 
