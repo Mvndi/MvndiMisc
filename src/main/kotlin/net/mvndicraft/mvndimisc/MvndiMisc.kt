@@ -122,7 +122,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onPlayyerInteract(e: PlayerInteractEvent) {
+    fun onPlayerInteract(e: PlayerInteractEvent) {
         val b = e.clickedBlock
         val item = e.item
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
