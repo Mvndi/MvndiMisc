@@ -9,6 +9,8 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.ShulkerBox
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -17,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -128,5 +131,16 @@ class MvndiMisc : JavaPlugin(), Listener {
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
         if (item.type == Material.BONE_MEAL && !b.type.toString().lowercase().contains("grass"))
             e.isCancelled = true
+    }
+
+    @EventHandler
+    fun onEntitySpawnEvent(event: PlayerInteractAtEntityEvent) {
+        val entity = event.rightClicked
+        if (entity.type == EntityType.ARMOR_STAND) {
+            val armorStand = entity as ArmorStand
+            if (!armorStand.isInvisible) {
+                entity.setArms(true)
+            }
+        }
     }
 }
