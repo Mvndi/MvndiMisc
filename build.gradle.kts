@@ -39,7 +39,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
-    compileOnly("net.mvndicraft:mvndiseasons:0.8.5-SNAPSHOT")
+    compileOnly("net.mvndicraft:mvndiseasons:0.9.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiplayers:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndistats:2.0.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

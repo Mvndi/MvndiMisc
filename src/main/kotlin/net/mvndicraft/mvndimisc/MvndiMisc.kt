@@ -44,8 +44,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         val id = ItemManager.getInstance().getId(item)
         val entity = event.entity
 
-        if (id == "invisible_item_frame" && entity is ItemFrame)
-            entity.isVisible = false
+        if (id == "invisible_item_frame" && entity is ItemFrame) entity.isVisible = false
     }
 
     @EventHandler
@@ -90,9 +89,11 @@ class MvndiMisc : JavaPlugin(), Listener {
     fun onBlockPlace(event: BlockPlaceEvent) {
 
         val p = event.player
-        val biomeName = p.location.block.biome.name.lowercase()
-
-        if (p.gameMode != GameMode.CREATIVE && ((biomeName.contains("ocean") && biomeName.contains("deep")) || (NMSBiomeUtils.getBiomeKeyString(p.location).contains("ocean") && NMSBiomeUtils.getBiomeKeyString(p.location).contains("deep")))) {
+        val biomeKey = NMSBiomeUtils.getBiomeKeyString(p.location)
+        if (p.gameMode != GameMode.CREATIVE && (NMSBiomeUtils.matchTag(
+                biomeKey, "minecraft:is_ocean"
+            ) || NMSBiomeUtils.matchTag(biomeKey, "mvndi:is_deep_ocean"))
+        ) {
             p.sendMessage("No building in ocean")
             event.isCancelled = true
         }
@@ -111,15 +112,16 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onWalkOnIce(e: PlayerMoveEvent) {
         val p = e.player
-        val b = p.location.subtract(0.0, 1.0, 0.0).block
-        if (!b.type.toString().lowercase().contains("ice"))
-            return
+        val b = if (p.vehicle != null) p.location.subtract(0.0, 2.0, 0.0).block else p.location.subtract(
+            0.0, 1.0, 0.0
+        ).block
+        if (!b.type.toString().lowercase().contains("ice")) return
 
         val mPlayer = Objects.requireNonNull<MvndiPlayer>(PlayerManager.getInstance().getPlayer(p.uniqueId))
         val stats = mPlayer.stats
-        p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 0.05f, 1f)
-        if (mPlayer.equipLoad/stats.equipLoad > 0.75 && Random().nextFloat() <= 0.5f) {
-            b.type = Material.WATER
+        if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Random().nextFloat() <= 0.5f) {
+            p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 0.05f, 1f)
+            b.breakNaturally()
             p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
         }
     }
@@ -129,8 +131,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         val b = e.clickedBlock
         val item = e.item
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
-        if (item.type == Material.BONE_MEAL && !b.type.toString().lowercase().contains("grass"))
-            e.isCancelled = true
+        if (item.type == Material.BONE_MEAL && !b.type.toString().lowercase().contains("grass")) e.isCancelled = true
     }
 
     @EventHandler
