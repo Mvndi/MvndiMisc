@@ -17,6 +17,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
@@ -124,6 +125,12 @@ class MvndiMisc : JavaPlugin(), Listener {
             b.breakNaturally()
             p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
         }
+    }
+
+    @EventHandler
+    fun prreventInfest(e: EntityChangeBlockEvent) {
+        if (e.entity.type == EntityType.SILVERFISH)
+            e.isCancelled = true
     }
 
     @EventHandler
