@@ -1,6 +1,7 @@
 package net.mvndicraft.mvndimisc
 
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
+import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
 import net.mvndicraft.mvndiplayers.MvndiPlayer
@@ -19,6 +20,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
@@ -89,7 +91,6 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-
         val p = event.player
         val biomeKey = NMSBiomeUtils.getBiomeKeyString(p.location)
         if (p.gameMode != GameMode.CREATIVE && (NMSBiomeUtils.matchTag(
@@ -129,20 +130,22 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun prreventInfest(e: EntityChangeBlockEvent) {
+    fun preventInfest(e: EntityChangeBlockEvent) {
         if (e.entity.type == EntityType.SILVERFISH)
             e.isCancelled = true
     }
 
-   @EventHandler
-   fun preventHoeWithWeapon(e: PlayerInteractEvent) {
-       val item = e.item
-       if (item == null || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance().getId(item) == null)
-           return
+    @EventHandler
+    fun preventHoeWithWeapon(e: PlayerInteractEvent) {
+        val item = e.item
+        if (item == null || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance()
+                .getId(item) == null
+        )
+            return
 
-       if (ItemManager.getInstance().getItem(ItemManager.getInstance().getId(item)).type == Item.Type.WEAPON)
-           e.isCancelled = true
-   }
+        if (ItemManager.getInstance().getItem(ItemManager.getInstance().getId(item)).type == Item.Type.WEAPON)
+            e.isCancelled = true
+    }
 
     @EventHandler
     fun preventBonemeal(e: PlayerInteractEvent) {
@@ -155,11 +158,35 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onEntitySpawnEvent(event: PlayerInteractAtEntityEvent) {
         val entity = event.rightClicked
-        if (entity.type == EntityType.ARMOR_STAND) {
-            val armorStand = entity as ArmorStand
-            if (!armorStand.isInvisible) {
-                entity.setArms(true)
-            }
+        if (entity.type != EntityType.ARMOR_STAND)
+            return
+
+        val armorStand = entity as ArmorStand
+        if (!armorStand.isInvisible) {
+            armorStand.setArms(true)
+            var item = event.player.equipment.itemInMainHand
+            val empty = item.isEmpty
+            val offItem = event.player.equipment.itemInOffHand
+            if (empty)
+                item = offItem
+
+            val mvndiId = ItemManager.getInstance().getId(item) ?: return
+            val mvndiItem = ItemManager.getInstance().getItem(mvndiId) ?: return
+            event.player.activeItem.subtract()
+            armorStand.equipment.setItem(
+                if (mvndiItem.type == Item.Type.WEAPON) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot,
+                item
+            )
         }
+    }
+
+    @EventHandler
+    fun dropArmorStandEquipment(e: EntityDeathEvent) {
+        val entity = e.entity
+        if (entity.type != EntityType.ARMOR_STAND || entity.isInvisible)
+            return
+
+        val armorStand = entity as ArmorStand
+        EquipmentSlot.entries.forEach {equipmentSlot -> armorStand.world.dropItemNaturally(armorStand.location, armorStand.getItem(equipmentSlot))}
     }
 }
