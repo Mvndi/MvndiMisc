@@ -1,6 +1,7 @@
 package net.mvndicraft.mvndimisc
 
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
+import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
 import net.mvndicraft.mvndiplayers.MvndiPlayer
 import net.mvndicraft.mvndiplayers.PlayerManager
@@ -133,8 +134,18 @@ class MvndiMisc : JavaPlugin(), Listener {
             e.isCancelled = true
     }
 
+   @EventHandler
+   fun preventHoeWithWeapon(e: PlayerInteractEvent) {
+       val item = e.item
+       if (item == null || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance().getId(item) == null)
+           return
+
+       if (ItemManager.getInstance().getItem(ItemManager.getInstance().getId(item)).type == Item.Type.WEAPON)
+           e.isCancelled = true
+   }
+
     @EventHandler
-    fun onPlayerInteract(e: PlayerInteractEvent) {
+    fun preventBonemeal(e: PlayerInteractEvent) {
         val b = e.clickedBlock
         val item = e.item
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
