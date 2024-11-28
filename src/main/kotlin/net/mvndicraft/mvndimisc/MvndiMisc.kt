@@ -173,9 +173,9 @@ class MvndiMisc : JavaPlugin(), Listener {
             if (empty)
                 item = offItem
 
-            event.player.activeItem.subtract()
             if (item.type == Material.PLAYER_HEAD) {
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
+                item.subtract()
                 return
             }
 
@@ -185,6 +185,7 @@ class MvndiMisc : JavaPlugin(), Listener {
                 if (mvndiItem.type == Item.Type.WEAPON) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot,
                 item
             )
+            item.subtract()
         }
     }
 
