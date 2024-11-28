@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
+import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -143,7 +144,8 @@ class MvndiMisc : JavaPlugin(), Listener {
         )
             return
 
-        if (ItemManager.getInstance().getItem(ItemManager.getInstance().getId(item)).type == Item.Type.WEAPON)
+        val id = ItemManager.getInstance().getId(item)
+        if (id != null && ItemManager.getInstance().getItem(id).type == Item.Type.WEAPON)
             e.isCancelled = true
     }
 
@@ -187,6 +189,16 @@ class MvndiMisc : JavaPlugin(), Listener {
             return
 
         val armorStand = entity as ArmorStand
-        EquipmentSlot.entries.forEach {equipmentSlot -> armorStand.world.dropItemNaturally(armorStand.location, armorStand.getItem(equipmentSlot))}
+        EquipmentSlot.entries.forEach { equipmentSlot ->
+            armorStand.world.dropItemNaturally(
+                armorStand.location,
+                armorStand.getItem(equipmentSlot)
+            )
+        }
+    }
+
+    @EventHandler
+    fun anvilCost(e: PrepareAnvilEvent) {
+        e.view.repairCost = 0
     }
 }
