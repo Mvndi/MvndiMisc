@@ -144,8 +144,9 @@ class MvndiMisc : JavaPlugin(), Listener {
         )
             return
 
-        val id = ItemManager.getInstance().getId(item)
-        if (id != null && ItemManager.getInstance().getItem(id).type == Item.Type.WEAPON)
+        val id = ItemManager.getInstance().getId(item) ?: return
+        val mvndiItem = ItemManager.getInstance().getItem(id) ?: return
+        if (mvndiItem.type == Item.Type.WEAPON)
             e.isCancelled = true
     }
 
