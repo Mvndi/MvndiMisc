@@ -159,7 +159,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onEntitySpawnEvent(event: PlayerInteractAtEntityEvent) {
+    fun armorStands(event: PlayerInteractAtEntityEvent) {
         val entity = event.rightClicked
         if (entity.type != EntityType.ARMOR_STAND)
             return
@@ -172,6 +172,9 @@ class MvndiMisc : JavaPlugin(), Listener {
             val offItem = event.player.equipment.itemInOffHand
             if (empty)
                 item = offItem
+
+            if (item.isEmpty)
+                return
 
             if (item.type == Material.PLAYER_HEAD) {
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
