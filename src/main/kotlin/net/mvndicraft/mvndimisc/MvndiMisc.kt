@@ -139,7 +139,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun preventHoeWithWeapon(e: PlayerInteractEvent) {
         val item = e.item
-        if (item == null || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance()
+        if (item == null || !item.hasItemMeta() || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance()
                 .getId(item) == null
         )
             return
