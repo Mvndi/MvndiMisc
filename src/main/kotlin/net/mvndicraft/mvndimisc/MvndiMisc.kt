@@ -114,6 +114,16 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
+    fun onWalkOnLilypad(e: PlayerMoveEvent) {
+        val p = e.player
+        val b = if (p.vehicle != null) p.location.subtract(0.0, 2.0, 0.0).block else p.location.subtract(
+            0.0, 1.0, 0.0
+        ).block
+        if (b.type == Material.LILY_PAD)
+            b.breakNaturally()
+    }
+
+    @EventHandler
     fun onWalkOnIce(e: PlayerMoveEvent) {
         val p = e.player
         val b = if (p.vehicle != null) p.location.subtract(0.0, 2.0, 0.0).block else p.location.subtract(
