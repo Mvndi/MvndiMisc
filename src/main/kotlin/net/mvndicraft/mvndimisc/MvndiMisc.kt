@@ -4,16 +4,17 @@ import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
-import net.mvndicraft.mvndiplayers.MvndiPlayer
 import net.mvndicraft.mvndiplayers.PlayerManager
 import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -124,17 +125,38 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onWalkOnIce(e: PlayerMoveEvent) {
         val p = e.player
-        val b = if (p.vehicle != null) p.location.subtract(0.0, 2.0, 0.0).block else p.location.subtract(
-            0.0, 1.0, 0.0
-        ).block
+        val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
+        val b = p.location.subtract(0.0, 1.0, 0.0).block
+
         if (!b.type.toString().lowercase().contains("ice")) return
 
-        val mPlayer = Objects.requireNonNull<MvndiPlayer>(PlayerManager.getInstance().getPlayer(p.uniqueId))
+        if (horse)
+            breakIceUnderHorse(b)
+        else
+            checkPlayerWeight(p, b)
+    }
+
+
+    private fun breakIceUnderHorse(block: Block) {
+        if (block.type.toString().lowercase().contains("ice"))
+            block.breakNaturally()
+
+        for (x in -3..3)
+            for (z in -3..3) {
+                val targetBlock = block.location.clone().add(x.toDouble(), 0.0, z.toDouble()).block
+                if (targetBlock.type.toString().lowercase().contains("ice"))
+                    targetBlock.breakNaturally()
+            }
+
+        block.world.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
+    }
+
+    private fun checkPlayerWeight(player: Player, block: Block) {
+        val mPlayer = PlayerManager.getInstance().getPlayer(player.uniqueId) ?: return
         val stats = mPlayer.stats
-        if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Random().nextFloat() <= 0.5f) {
-            p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 0.05f, 1f)
-            b.breakNaturally()
-            p.playSound(p, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
+        if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Math.random() <= 0.5) {
+            block.breakNaturally()
+            block.location.world?.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
         }
     }
 
