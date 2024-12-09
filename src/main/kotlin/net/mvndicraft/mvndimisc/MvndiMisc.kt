@@ -122,7 +122,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             return
 
         val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
-        val b = p.location.subtract(0.0, 1.0, 0.0).block
+        val b = p.location.block
 
         if (b.type != Material.LILY_PAD)
             return
@@ -131,8 +131,6 @@ class MvndiMisc : JavaPlugin(), Listener {
 
         if (horse)
             breakUnderHorse(b)
-
-
     }
 
     @EventHandler
