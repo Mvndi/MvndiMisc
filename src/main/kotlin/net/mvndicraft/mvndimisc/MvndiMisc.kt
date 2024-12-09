@@ -117,47 +117,63 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onWalkOnLilypad(e: PlayerMoveEvent) {
         val p = e.player
-        val b = if (p.vehicle != null) p.location.subtract(0.0, 1.0, 0.0).block else p.location.block
-        if (b.type == Material.LILY_PAD)
-            b.breakNaturally()
+
+        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR)
+            return
+
+        val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
+        val b = p.location.subtract(0.0, 1.0, 0.0).block
+
+        if (b.type != Material.LILY_PAD)
+            return
+
+        b.breakNaturally()
+
+        if (horse)
+            breakUnderHorse(b)
+
+
     }
 
     @EventHandler
     fun onWalkOnIce(e: PlayerMoveEvent) {
         val p = e.player
+
+        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR)
+            return
+
         val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
         val b = p.location.subtract(0.0, 1.0, 0.0).block
 
         if (!b.type.toString().lowercase().contains("ice")) return
 
-        if (horse)
-            breakIceUnderHorse(b)
-        else
-            checkPlayerWeight(p, b)
+        val mPlayer = PlayerManager.getInstance().getPlayer(p.uniqueId) ?: return
+        val stats = mPlayer.stats
+
+        if (horse && mPlayer.equipLoad / stats.equipLoad > 0.5 && Math.random() <= 0.5)
+            breakUnderHorse(b)
+        else if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Math.random() <= 0.5) {
+            b.breakNaturally()
+            b.location.world?.playSound(b.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
+        }
     }
 
 
-    private fun breakIceUnderHorse(block: Block) {
-        if (block.type.toString().lowercase().contains("ice"))
+    private fun breakUnderHorse(block: Block) {
+        if (block.type == Material.LILY_PAD || block.type.toString().lowercase().contains("ice"))
             block.breakNaturally()
 
         for (x in -3..3)
             for (z in -3..3) {
                 val targetBlock = block.location.clone().add(x.toDouble(), 0.0, z.toDouble()).block
-                if (targetBlock.type.toString().lowercase().contains("ice"))
+                if (targetBlock.type == Material.LILY_PAD || targetBlock.type.toString().lowercase().contains("ice"))
                     targetBlock.breakNaturally()
+                if (targetBlock.type.toString().lowercase().contains("ice"))
+                    targetBlock.world.playSound(targetBlock.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
             }
 
-        block.world.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
-    }
-
-    private fun checkPlayerWeight(player: Player, block: Block) {
-        val mPlayer = PlayerManager.getInstance().getPlayer(player.uniqueId) ?: return
-        val stats = mPlayer.stats
-        if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Math.random() <= 0.5) {
-            block.breakNaturally()
-            block.location.world?.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
-        }
+        if (block.type.toString().lowercase().contains("ice"))
+            block.world.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
     }
 
     @EventHandler
