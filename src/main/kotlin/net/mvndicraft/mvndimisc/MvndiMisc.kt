@@ -14,7 +14,6 @@ import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -31,7 +30,6 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.*
 
 class MvndiMisc : JavaPlugin(), Listener {
 
@@ -118,27 +116,23 @@ class MvndiMisc : JavaPlugin(), Listener {
     fun onWalkOnLilypad(e: PlayerMoveEvent) {
         val p = e.player
 
-        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR)
-            return
+        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR) return
 
         val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
         val b = p.location.block
 
-        if (b.type != Material.LILY_PAD)
-            return
+        if (b.type != Material.LILY_PAD) return
 
         b.breakNaturally()
 
-        if (horse)
-            breakUnderHorse(b)
+        if (horse) breakUnderHorse(b)
     }
 
     @EventHandler
     fun onWalkOnIce(e: PlayerMoveEvent) {
         val p = e.player
 
-        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR)
-            return
+        if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR) return
 
         val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
         val b = p.location.subtract(0.0, 1.0, 0.0).block
@@ -148,8 +142,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         val mPlayer = PlayerManager.getInstance().getPlayer(p.uniqueId) ?: return
         val stats = mPlayer.stats
 
-        if (horse && mPlayer.equipLoad / stats.equipLoad > 0.5 && Math.random() <= 0.5)
-            breakUnderHorse(b)
+        if (horse && mPlayer.equipLoad / stats.equipLoad > 0.5 && Math.random() <= 0.5) breakUnderHorse(b)
         else if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Math.random() <= 0.5) {
             b.breakNaturally()
             b.location.world?.playSound(b.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
@@ -158,26 +151,29 @@ class MvndiMisc : JavaPlugin(), Listener {
 
 
     private fun breakUnderHorse(block: Block) {
-        if (block.type == Material.LILY_PAD || block.type.toString().lowercase().contains("ice"))
-            block.breakNaturally()
+        if (block.type == Material.LILY_PAD || block.type.toString().lowercase().contains("ice")) block.breakNaturally()
 
-        for (x in -3..3)
-            for (z in -3..3) {
-                val targetBlock = block.location.clone().add(x.toDouble(), 0.0, z.toDouble()).block
-                if (targetBlock.type == Material.LILY_PAD || targetBlock.type.toString().lowercase().contains("ice"))
-                    targetBlock.breakNaturally()
-                if (targetBlock.type.toString().lowercase().contains("ice"))
-                    targetBlock.world.playSound(targetBlock.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
-            }
+        for (x in -3..3) for (z in -3..3) {
+            val targetBlock = block.location.clone().add(x.toDouble(), 0.0, z.toDouble()).block
+            if (targetBlock.type == Material.LILY_PAD || targetBlock.type.toString().lowercase()
+                    .contains("ice")
+            ) targetBlock.breakNaturally()
+            if (targetBlock.type.toString().lowercase().contains("ice")) targetBlock.world.playSound(
+                targetBlock.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f
+            )
+        }
 
-        if (block.type.toString().lowercase().contains("ice"))
-            block.world.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
+        if (block.type.toString().lowercase().contains("ice")) block.world.playSound(
+            block.location,
+            Material.ICE.createBlockData().soundGroup.breakSound,
+            2f,
+            1f
+        )
     }
 
     @EventHandler
     fun preventInfest(e: EntityChangeBlockEvent) {
-        if (e.entity.type == EntityType.SILVERFISH)
-            e.isCancelled = true
+        if (e.entity.type == EntityType.SILVERFISH) e.isCancelled = true
     }
 
     @EventHandler
@@ -185,13 +181,11 @@ class MvndiMisc : JavaPlugin(), Listener {
         val item = e.item
         if (item == null || !item.hasItemMeta() || e.clickedBlock?.type != Material.GRASS_BLOCK || ItemManager.getInstance()
                 .getId(item) == null
-        )
-            return
+        ) return
 
         val id = ItemManager.getInstance().getId(item) ?: return
         val mvndiItem = ItemManager.getInstance().getItem(id) ?: return
-        if (mvndiItem.type == Item.Type.WEAPON)
-            e.isCancelled = true
+        if (mvndiItem.type == Item.Type.WEAPON) e.isCancelled = true
     }
 
     @EventHandler
@@ -205,8 +199,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun armorStands(event: PlayerInteractAtEntityEvent) {
         val entity = event.rightClicked
-        if (entity.type != EntityType.ARMOR_STAND)
-            return
+        if (entity.type != EntityType.ARMOR_STAND) return
 
         val armorStand = entity as ArmorStand
         if (!armorStand.isInvisible) {
@@ -214,11 +207,9 @@ class MvndiMisc : JavaPlugin(), Listener {
             var item = event.player.equipment.itemInMainHand
             val empty = item.isEmpty
             val offItem = event.player.equipment.itemInOffHand
-            if (empty)
-                item = offItem
+            if (empty) item = offItem
 
-            if (item.isEmpty)
-                return
+            if (item.isEmpty) return
 
             if (item.type == Material.PLAYER_HEAD) {
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
@@ -239,15 +230,13 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun dropArmorStandEquipment(e: EntityDeathEvent) {
         val entity = e.entity
-        if (entity.type != EntityType.ARMOR_STAND || entity.isInvisible)
-            return
+        if (entity.type != EntityType.ARMOR_STAND || entity.isInvisible) return
 
         val armorStand = entity as ArmorStand
         EquipmentSlot.entries.forEach { equipmentSlot ->
             try {
                 armorStand.world.dropItemNaturally(
-                    armorStand.location,
-                    armorStand.getItem(equipmentSlot)
+                    armorStand.location, armorStand.getItem(equipmentSlot)
                 )
             } catch (ignore: Exception) {
             }
