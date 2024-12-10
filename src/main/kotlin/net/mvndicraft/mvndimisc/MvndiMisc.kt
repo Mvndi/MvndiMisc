@@ -92,14 +92,6 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         val p = event.player
-        val biomeKey = NMSBiomeUtils.getBiomeKeyString(p.location)
-        if (p.gameMode != GameMode.CREATIVE && (NMSBiomeUtils.matchTag(
-                biomeKey, "minecraft:is_ocean"
-            ) || NMSBiomeUtils.matchTag(biomeKey, "mvndi:is_deep_ocean"))
-        ) {
-            p.sendMessage("No building in ocean")
-            event.isCancelled = true
-        }
 
         if (p.location.y <= -60) {
             p.sendMessage("No building this far underground")
