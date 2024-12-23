@@ -9,6 +9,9 @@ import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.ArmorStand
@@ -23,7 +26,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
-import org.bukkit.event.inventory.PrepareAnvilEvent
+import org.bukkit.event.inventory.*
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -238,5 +241,41 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun anvilCost(e: PrepareAnvilEvent) {
         e.view.repairCost = 0
+    }
+
+    private val noDamageMod = AttributeModifier(NamespacedKey(this, "attack_damage_mod"), -1.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+
+    private fun removeDamage(item: ItemStack?): ItemStack? {
+        if (item == null || item.isEmpty)
+            return item
+
+        val matName = item.type.toString().lowercase()
+        if (matName.contains("axe") || matName.contains("shovel")) {
+            val meta = item.itemMeta
+            if (meta.hasAttributeModifiers() && meta.getAttributeModifiers()?.get(Attribute.ATTACK_DAMAGE)?.contains(noDamageMod) === true)
+                return item
+
+            meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, noDamageMod)
+            item.itemMeta = meta
+            return item
+        }
+
+        return item
+    }
+
+    @EventHandler
+    fun removeToolDamageCraft(e: PrepareItemCraftEvent) {
+        val item = removeDamage(e.inventory.getItem(0)) ?: return
+        e.inventory.setItem(0, item)
+    }
+
+    @EventHandler
+    fun removeToolDamageCLick(e: InventoryClickEvent) {
+        if (e.clickedInventory == null) return
+
+       for (i in e.clickedInventory!!.storageContents.indices) {
+           val item = e.clickedInventory!!.storageContents[i] ?: continue
+           e.clickedInventory!!.setItem(i, removeDamage(item))
+       }
     }
 }
