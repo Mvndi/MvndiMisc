@@ -271,7 +271,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun removeToolDamageCLick(e: InventoryClickEvent) {
-        if (e.clickedInventory == null) return
+        if (e.clickedInventory == null || e.whoClicked.gameMode == GameMode.CREATIVE || e.whoClicked.gameMode == GameMode.SPECTATOR) return
 
        for (i in e.clickedInventory!!.storageContents.indices) {
            val item = e.clickedInventory!!.storageContents[i] ?: continue
