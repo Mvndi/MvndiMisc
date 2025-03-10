@@ -71,6 +71,10 @@ tasks {
         }
     }
 
+    shadowJar {
+        archiveFileName.set("${project.name}-${project.version}.jar")
+    }
+
     runServer {
         minecraftVersion("1.21.1")
     }
