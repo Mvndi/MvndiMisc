@@ -5,7 +5,6 @@ import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
 import net.mvndicraft.mvndiplayers.PlayerManager
-import net.mvndicraft.mvndiseasons.biomes.NMSBiomeUtils
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -26,7 +25,9 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
-import org.bukkit.event.inventory.*
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.PrepareAnvilEvent
+import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -243,22 +244,22 @@ class MvndiMisc : JavaPlugin(), Listener {
         e.view.repairCost = 0
     }
 
-    private val noDamageMod = AttributeModifier(NamespacedKey(this, "attack_damage_mod"), -1.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+    private val noDamageMod =
+        AttributeModifier(NamespacedKey(this, "attack_damage_mod"), -1.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
 
     private fun removeDamage(item: ItemStack?): ItemStack? {
         if (item == null || item.isEmpty)
             return item
 
-        val matName = item.type.toString().lowercase()
-        if (matName.contains("axe") || matName.contains("shovel")) {
-            val meta = item.itemMeta
-            if (meta.hasAttributeModifiers() && meta.getAttributeModifiers()?.get(Attribute.ATTACK_DAMAGE)?.contains(noDamageMod) === true)
-                return item
-
-            meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, noDamageMod)
-            item.itemMeta = meta
+        val meta = item.itemMeta
+        if (meta.hasAttributeModifiers() && meta.getAttributeModifiers()?.get(Attribute.ATTACK_DAMAGE)
+                ?.contains(noDamageMod) === true
+        )
             return item
-        }
+
+        meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, noDamageMod)
+        item.itemMeta = meta
+        return item
 
         return item
     }
@@ -273,9 +274,11 @@ class MvndiMisc : JavaPlugin(), Listener {
     fun removeToolDamageCLick(e: InventoryClickEvent) {
         if (e.clickedInventory == null || e.whoClicked.gameMode == GameMode.CREATIVE || e.whoClicked.gameMode == GameMode.SPECTATOR) return
 
-       for (i in e.clickedInventory!!.storageContents.indices) {
-           val item = e.clickedInventory!!.storageContents[i] ?: continue
-           e.clickedInventory!!.setItem(i, removeDamage(item))
-       }
+        for (i in e.clickedInventory!!.storageContents.indices) {
+            val item = e.clickedInventory!!.storageContents[i] ?: continue
+            val matName = item.type.toString().lowercase()
+            if (matName.contains("axe") || matName.contains("shovel"))
+                e.clickedInventory!!.setItem(i, removeDamage(item))
+        }
     }
 }
