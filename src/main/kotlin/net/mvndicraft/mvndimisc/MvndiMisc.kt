@@ -270,6 +270,12 @@ class MvndiMisc : JavaPlugin(), Listener {
        return lowercase.contains("axe") || lowercase.contains("shovel")
     }
 
+    private fun isArmor(i: ItemStack?): Boolean {
+        if (i == null) return false
+        val lowercase = i.type.toString().lowercase()
+        return lowercase.contains("leggings") || lowercase.contains("chestplate") || lowercase.contains("boots") || lowercase.contains("helmet")
+    }
+
     @EventHandler
     fun removeToolDamageCraft(e: PrepareItemCraftEvent) {
         if (!isTool(e.inventory.getItem(0))) return
@@ -278,13 +284,15 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun removeToolDamageCLick(e: InventoryClickEvent) {
+    fun removeToolDamageClickRemoveVanilaArmor(e: InventoryClickEvent) {
         if (e.clickedInventory == null || e.whoClicked.gameMode == GameMode.CREATIVE || e.whoClicked.gameMode == GameMode.SPECTATOR) return
 
         for (i in e.clickedInventory!!.storageContents.indices) {
             val item = e.clickedInventory!!.storageContents[i] ?: continue
             if (isTool(item))
                 e.clickedInventory!!.setItem(i, removeDamage(item))
+            if (!ItemManager.getInstance().isItem(item) && isArmor(item))
+                e.clickedInventory!!.setItem(i, null)
         }
     }
 }
