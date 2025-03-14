@@ -264,8 +264,15 @@ class MvndiMisc : JavaPlugin(), Listener {
         return item
     }
 
+    private fun isTool(i: ItemStack?): Boolean {
+        if (i == null) return false
+        val lowercase = i.type.toString().lowercase()
+       return lowercase.contains("axe") || lowercase.contains("shovel")
+    }
+
     @EventHandler
     fun removeToolDamageCraft(e: PrepareItemCraftEvent) {
+        if (!isTool(e.inventory.getItem(0))) return
         val item = removeDamage(e.inventory.getItem(0)) ?: return
         e.inventory.setItem(0, item)
     }
@@ -276,8 +283,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
         for (i in e.clickedInventory!!.storageContents.indices) {
             val item = e.clickedInventory!!.storageContents[i] ?: continue
-            val matName = item.type.toString().lowercase()
-            if (matName.contains("axe") || matName.contains("shovel"))
+            if (isTool(item))
                 e.clickedInventory!!.setItem(i, removeDamage(item))
         }
     }
