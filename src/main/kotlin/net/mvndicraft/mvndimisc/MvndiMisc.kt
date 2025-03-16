@@ -48,7 +48,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun onItemFramePlace(event: HangingPlaceEvent) {
-        val item = event.itemStack
+        val item = event.itemStack?: return
         val id = ItemManager.getInstance().getId(item)
         val entity = event.entity
 
