@@ -209,6 +209,10 @@ class MvndiMisc : JavaPlugin(), Listener {
             if (item.isEmpty) return
 
             if (item.type == Material.PLAYER_HEAD) {
+                val armorStandHead = armorStand.equipment.getItem(EquipmentSlot.HEAD)
+                if (!armorStandHead.isEmpty)
+                    armorStand.world.dropItemNaturally(armorStand.location, armorStandHead)
+
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
                 item.subtract()
                 return
@@ -216,10 +220,14 @@ class MvndiMisc : JavaPlugin(), Listener {
 
             val mvndiId = ItemManager.getInstance().getId(item) ?: return
             val mvndiItem = ItemManager.getInstance().getItem(mvndiId) ?: return
-            armorStand.equipment.setItem(
-                if (mvndiItem.type == Item.Type.WEAPON) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot,
-                item
-            )
+
+            val slot = if (mvndiItem.type == Item.Type.WEAPON) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
+            val armorStandItem = armorStand.equipment.getItem(slot)
+
+            if (!armorStandItem.isEmpty)
+                armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
+
+            armorStand.equipment.setItem(slot, item)
             item.subtract()
         }
     }
