@@ -189,6 +189,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         val b = e.clickedBlock
         val item = e.item
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
+        if (b.type == Material.GRASS_BLOCK) return
         if (item.type == Material.BONE_MEAL && !(b.type.toString().lowercase().contains("grass") || b.type == Material.DIRT || b.type == Material.SNOW_BLOCK)) e.isCancelled = true
     }
 
