@@ -31,6 +31,7 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -230,6 +231,11 @@ class MvndiMisc : JavaPlugin(), Listener {
             armorStand.equipment.setItem(slot, item)
             item.subtract()
         }
+    }
+
+    @EventHandler
+    fun nether(e: PortalCreateEvent) {
+        e.isCancelled = true
     }
 
     @EventHandler
