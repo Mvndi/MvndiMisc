@@ -222,7 +222,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             val mvndiId = ItemManager.getInstance().getId(item) ?: return
             val mvndiItem = ItemManager.getInstance().getItem(mvndiId) ?: return
 
-            val slot = if (mvndiItem.type == Item.Type.WEAPON) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
+            val slot = if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
             val armorStandItem = armorStand.equipment.getItem(slot)
 
             if (!armorStandItem.isEmpty)
