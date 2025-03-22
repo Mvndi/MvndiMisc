@@ -187,6 +187,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun preventBonemeal(e: PlayerInteractEvent) {
+        if (e.player.gameMode == GameMode.CREATIVE) return
         val b = e.clickedBlock
         val item = e.item
         if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
