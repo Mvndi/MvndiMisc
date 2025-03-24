@@ -13,6 +13,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
+import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
@@ -232,6 +233,23 @@ class MvndiMisc : JavaPlugin(), Listener {
             armorStand.equipment.setItem(slot, item)
             item.subtract()
         }
+    }
+
+    @EventHandler
+    fun breedHorsesWithHay(event: PlayerInteractAtEntityEvent) {
+        val item = event.player.equipment.itemInMainHand
+        if (item.isEmpty || item.type != Material.HAY_BLOCK) return
+
+        val entity = event.rightClicked
+        if (!setOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE).contains(entity.type)) return
+
+        val abstractHorse = entity as AbstractHorse
+
+        if (!abstractHorse.canBreed()) return
+
+        abstractHorse.breedCause = event.player.uniqueId
+        abstractHorse.loveModeTicks = 20 * 10
+        item.subtract()
     }
 
     @EventHandler
