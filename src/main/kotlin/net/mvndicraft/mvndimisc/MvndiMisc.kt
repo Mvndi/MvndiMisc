@@ -217,7 +217,7 @@ class MvndiMisc : JavaPlugin(), Listener {
                     armorStand.world.dropItemNaturally(armorStand.location, armorStandHead)
 
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
-                item.subtract()
+                item.amount = 0
                 return
             }
 
@@ -231,7 +231,7 @@ class MvndiMisc : JavaPlugin(), Listener {
                 armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
 
             armorStand.equipment.setItem(slot, item)
-            item.subtract()
+            item.amount = 0
         }
     }
 
