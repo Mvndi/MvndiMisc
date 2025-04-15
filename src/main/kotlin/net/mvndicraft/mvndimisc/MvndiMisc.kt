@@ -187,16 +187,6 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun preventBonemeal(e: PlayerInteractEvent) {
-        if (e.player.gameMode == GameMode.CREATIVE) return
-        val b = e.clickedBlock
-        val item = e.item
-        if (b == null || e.action != Action.RIGHT_CLICK_BLOCK || e.hand == EquipmentSlot.OFF_HAND || item == null) return
-        if (b.type == Material.GRASS_BLOCK) return
-        if (item.type == Material.BONE_MEAL && !(b.type.toString().lowercase().contains("grass") || b.type == Material.DIRT || b.type == Material.SNOW_BLOCK)) e.isCancelled = true
-    }
-
-    @EventHandler
     fun armorStands(event: PlayerInteractAtEntityEvent) {
         val entity = event.rightClicked
         if (entity.type != EntityType.ARMOR_STAND) return
