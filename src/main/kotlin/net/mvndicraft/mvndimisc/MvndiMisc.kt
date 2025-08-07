@@ -1,5 +1,6 @@
 package net.mvndicraft.mvndimisc
 
+import co.aikar.commands.PaperCommandManager
 import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
@@ -19,7 +20,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
@@ -42,6 +42,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     override fun onEnable() {
         // Plugin startup logic
         Bukkit.getServer().pluginManager.registerEvents(this, this)
+        PaperCommandManager(this).registerCommand(GamemodeSwitchCommand())
     }
 
     override fun onDisable() {

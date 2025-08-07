@@ -31,6 +31,8 @@ repositories {
     // towny
     maven("https://repo.glaremasters.me/repository/towny/")
 
+    maven("https://repo.aikar.co/content/groups/aikar/")
+
     // Mvndi
     mvndiRemote
 }
@@ -43,6 +45,7 @@ dependencies {
     compileOnly("net.mvndicraft:mvndiplayers:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndistats:2.0.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.107.0")
