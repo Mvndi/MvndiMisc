@@ -1,7 +1,6 @@
 package net.mvndicraft.mvndimisc
 
 import co.aikar.commands.PaperCommandManager
-import net.mvndicraft.mvndicore.events.ReloadConfigEvent
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
@@ -51,7 +50,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun onItemFramePlace(event: HangingPlaceEvent) {
-        val item = event.itemStack?: return
+        val item = event.itemStack ?: return
         val id = ItemManager.getInstance().getId(item)
         val entity = event.entity
 
@@ -66,6 +65,9 @@ class MvndiMisc : JavaPlugin(), Listener {
             entity.remove()
             val heldItem = entity.item
             entity.world.dropItem(entity.location, heldItem)
+
+            if (!ItemManager.getInstance().itemExists("inviisble_item_frame"))
+                return
 
             val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1)
             if (toDrop != null) {
@@ -210,7 +212,8 @@ class MvndiMisc : JavaPlugin(), Listener {
             val mvndiId = ItemManager.getInstance().getId(item) ?: return
             val mvndiItem = ItemManager.getInstance().getItem(mvndiId) ?: return
 
-            val slot = if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
+            val slot =
+                if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
             val armorStandItem = armorStand.equipment.getItem(slot)
 
             if (!armorStandItem.isEmpty)
@@ -280,20 +283,20 @@ class MvndiMisc : JavaPlugin(), Listener {
         meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, noDamageMod)
         item.itemMeta = meta
         return item
-
-        return item
     }
 
     private fun isTool(i: ItemStack?): Boolean {
         if (i == null) return false
         val lowercase = i.type.toString().lowercase()
-       return lowercase.contains("axe") || lowercase.contains("shovel")
+        return lowercase.contains("axe") || lowercase.contains("shovel")
     }
 
     private fun isArmor(i: ItemStack?): Boolean {
         if (i == null) return false
         val lowercase = i.type.toString().lowercase()
-        return lowercase.contains("leggings") || lowercase.contains("chestplate") || lowercase.contains("boots") || lowercase.contains("helmet")
+        return lowercase.contains("leggings") || lowercase.contains("chestplate") || lowercase.contains("boots") || lowercase.contains(
+            "helmet"
+        )
     }
 
     @EventHandler
