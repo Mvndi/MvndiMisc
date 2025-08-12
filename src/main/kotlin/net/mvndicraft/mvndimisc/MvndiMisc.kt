@@ -92,11 +92,6 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun equipmentReload(event: ReloadConfigEvent) {
-        this.isEnabled = ItemManager.getInstance().itemExists("invisible_item_frame")
-    }
-
-    @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         val p = event.player
 
