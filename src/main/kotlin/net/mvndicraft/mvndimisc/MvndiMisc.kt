@@ -66,7 +66,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             val heldItem = entity.item
             entity.world.dropItem(entity.location, heldItem)
 
-            if (!ItemManager.getInstance().itemExists("inviisble_item_frame"))
+            if (!ItemManager.getInstance().itemExists("invisible_item_frame"))
                 return
 
             val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1)
