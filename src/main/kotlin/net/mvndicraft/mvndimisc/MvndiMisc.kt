@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
+import net.mvndicraft.mvndimmo.executors.blacksmith.AnvilExecutor
 import net.mvndicraft.mvndiplayers.PlayerManager
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -60,6 +61,9 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun onItemFrameBreak(event: HangingBreakByEntityEvent) {
         val entity = event.entity
+
+        if (Bukkit.getPluginManager().isPluginEnabled("MvndiMMO") && entity.persistentDataContainer.has(AnvilExecutor.MINIGAME_KEY))
+            return
 
         if (entity is ItemFrame && !entity.isVisible) {
             entity.remove()

@@ -17,6 +17,9 @@ dependencies:
     MvndiStats:
       load: BEFORE
       required: true
+    MvndiMMO:
+      load: BEFORE
+      required: false
     Towny:
       load: BEFORE
       required: true
