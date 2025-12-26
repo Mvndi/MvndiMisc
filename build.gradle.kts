@@ -43,7 +43,7 @@ dependencies {
     compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiplayers:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndistats:2.0.0-SNAPSHOT")
-    compileOnly("net.mvndicraft:mvndimmo:1.1.3-SNAPSHOT")
+    compileOnly("net.mvndicraft.mvndimmo:mvndimmo:1.1.3-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
 
