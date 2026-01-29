@@ -8,6 +8,9 @@ website: mvndicraft.net
 folia-supported: true
 dependencies:
   server:
+    packetevents:
+      load: BEFORE
+      required: true
     MvndiEquipment:
       load: BEFORE
       required: true
@@ -20,6 +23,3 @@ dependencies:
     MvndiMMO:
       load: BEFORE
       required: false
-    Towny:
-      load: BEFORE
-      required: true

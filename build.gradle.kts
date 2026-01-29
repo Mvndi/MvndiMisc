@@ -28,10 +28,11 @@ repositories {
     // Kotlin
     maven("https://oss.sonatype.org/content/groups/public/")
 
-    // towny
-    maven("https://repo.glaremasters.me/repository/towny/")
-
     maven("https://repo.aikar.co/content/groups/aikar/")
+
+    maven("https://maven.pvphub.me/tofaa")
+
+    maven("https://repo.codemc.io/repository/maven-releases/")
 
     // Mvndi
     mvndiRemote
@@ -44,8 +45,10 @@ dependencies {
     compileOnly("net.mvndicraft:mvndiplayers:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndistats:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft.mvndimmo:mvndimmo:1.1.3-SNAPSHOT")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.11.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation("io.github.tofaa2:spigot:3.0.3-SNAPSHOT")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.107.0")

@@ -1,6 +1,18 @@
 package net.mvndicraft.mvndimisc
 
 import co.aikar.commands.PaperCommandManager
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
+import com.github.retrooper.packetevents.protocol.world.Location
+import com.github.retrooper.packetevents.resources.ResourceLocation
+import me.tofaa.entitylib.APIConfig
+import me.tofaa.entitylib.EntityLib
+import me.tofaa.entitylib.meta.display.ItemDisplayMeta
+import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform
+import me.tofaa.entitylib.wrapper.WrapperEntity
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
@@ -29,13 +41,13 @@ import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
+import com.github.retrooper.packetevents.protocol.item.ItemStack as PEItemStack
 
 class MvndiMisc : JavaPlugin(), Listener {
 
@@ -43,6 +55,21 @@ class MvndiMisc : JavaPlugin(), Listener {
         // Plugin startup logic
         Bukkit.getServer().pluginManager.registerEvents(this, this)
         PaperCommandManager(this).registerCommand(GamemodeSwitchCommand())
+
+        val platform = SpigotEntityLibPlatform(this)
+        val settings = APIConfig(PacketEvents.getAPI()).tickTickables()
+            .tickTickables()
+//            .trackPlatformEntities(true)
+            .usePlatformLogger()
+
+        EntityLib.init(platform, settings)
+
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, {
+            for (player in Bukkit.getOnlinePlayers()) {
+                val entity = playerEntities[player.uniqueId] ?: continue
+                entity.teleport(Location(player.location.x, player.location.y, player.location.z, 0f, 0f))
+            }
+        }, 1, UPDATE_TICKS.toLong())
     }
 
     override fun onDisable() {
@@ -62,16 +89,16 @@ class MvndiMisc : JavaPlugin(), Listener {
     fun onItemFrameBreak(event: HangingBreakByEntityEvent) {
         val entity = event.entity
 
-        if (Bukkit.getPluginManager().isPluginEnabled("MvndiMMO") && entity.persistentDataContainer.has(AnvilExecutor.MINIGAME_KEY))
-            return
+        if (Bukkit.getPluginManager()
+                .isPluginEnabled("MvndiMMO") && entity.persistentDataContainer.has(AnvilExecutor.MINIGAME_KEY)
+        ) return
 
         if (entity is ItemFrame && !entity.isVisible) {
             entity.remove()
             val heldItem = entity.item
             entity.world.dropItem(entity.location, heldItem)
 
-            if (!ItemManager.getInstance().itemExists("invisible_item_frame"))
-                return
+            if (!ItemManager.getInstance().itemExists("invisible_item_frame")) return
 
             val toDrop = ItemManager.getInstance().create("invisible_item_frame", 1)
             if (toDrop != null) {
@@ -164,10 +191,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         }
 
         if (block.type.toString().lowercase().contains("ice")) block.world.playSound(
-            block.location,
-            Material.ICE.createBlockData().soundGroup.breakSound,
-            2f,
-            1f
+            block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f
         )
     }
 
@@ -205,8 +229,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
             if (item.type == Material.PLAYER_HEAD) {
                 val armorStandHead = armorStand.equipment.getItem(EquipmentSlot.HEAD)
-                if (!armorStandHead.isEmpty)
-                    armorStand.world.dropItemNaturally(armorStand.location, armorStandHead)
+                if (!armorStandHead.isEmpty) armorStand.world.dropItemNaturally(armorStand.location, armorStandHead)
 
                 armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
                 item.amount = 0
@@ -220,8 +243,7 @@ class MvndiMisc : JavaPlugin(), Listener {
                 if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
             val armorStandItem = armorStand.equipment.getItem(slot)
 
-            if (!armorStandItem.isEmpty)
-                armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
+            if (!armorStandItem.isEmpty) armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
 
             armorStand.equipment.setItem(slot, item)
             item.amount = 0
@@ -275,14 +297,12 @@ class MvndiMisc : JavaPlugin(), Listener {
         AttributeModifier(NamespacedKey(this, "attack_damage_mod"), -1.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
 
     private fun removeDamage(item: ItemStack?): ItemStack? {
-        if (item == null || item.isEmpty)
-            return item
+        if (item == null || item.isEmpty) return item
 
         val meta = item.itemMeta
-        if (meta.hasAttributeModifiers() && meta.getAttributeModifiers()?.get(Attribute.ATTACK_DAMAGE)
+        if (meta.hasAttributeModifiers() && meta.attributeModifiers?.get(Attribute.ATTACK_DAMAGE)
                 ?.contains(noDamageMod) === true
-        )
-            return item
+        ) return item
 
         meta.addAttributeModifier(Attribute.ATTACK_DAMAGE, noDamageMod)
         item.itemMeta = meta
@@ -316,10 +336,41 @@ class MvndiMisc : JavaPlugin(), Listener {
 
         for (i in e.clickedInventory!!.storageContents.indices) {
             val item = e.clickedInventory!!.storageContents[i] ?: continue
-            if (isTool(item))
-                e.clickedInventory!!.setItem(i, removeDamage(item))
-            if (!ItemManager.getInstance().isItem(item) && isArmor(item))
-                e.clickedInventory!!.setItem(i, null)
+            if (isTool(item)) e.clickedInventory!!.setItem(i, removeDamage(item))
+            if (!ItemManager.getInstance().isItem(item) && isArmor(item)) e.clickedInventory!!.setItem(i, null)
         }
+    }
+
+    private val playerEntities: MutableMap<UUID, WrapperEntity> = HashMap()
+
+    companion object {
+        const val UPDATE_TICKS = 5 * 20
+    }
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        val entity = WrapperEntity(EntityTypes.ITEM_DISPLAY)
+        val meta = entity.entityMeta as ItemDisplayMeta
+
+        val builder = PEItemStack.builder()
+        builder.type(ItemTypes.DIAMOND_HOE)
+        builder.amount(1)
+        builder.component(ComponentTypes.ITEM_MODEL, ItemModel(ResourceLocation("shader_assets", "skybox")))
+        val skyboxItem = builder.build()
+
+        meta.item = skyboxItem
+
+        entity.spawn(Location(player.location.x, player.location.y, player.location.z, 0f, 0f))
+        entity.addViewer(PacketEvents.getAPI().playerManager.getUser(player))
+
+        playerEntities[player.uniqueId] = entity
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        val player = event.player
+        val entity = playerEntities.remove(player.uniqueId) ?: return
+        entity.remove()
     }
 }
