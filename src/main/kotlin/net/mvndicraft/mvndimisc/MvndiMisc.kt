@@ -57,8 +57,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         PaperCommandManager(this).registerCommand(GamemodeSwitchCommand())
 
         val platform = SpigotEntityLibPlatform(this)
-        val settings = APIConfig(PacketEvents.getAPI()).tickTickables()
-            .tickTickables()
+        val settings = APIConfig(PacketEvents.getAPI()).tickTickables().tickTickables()
 //            .trackPlatformEntities(true)
             .usePlatformLogger()
 
@@ -333,11 +332,11 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun removeToolDamageClickRemoveVanilaArmor(e: InventoryClickEvent) {
         if (e.clickedInventory == null || e.whoClicked.gameMode == GameMode.CREATIVE || e.whoClicked.gameMode == GameMode.SPECTATOR) return
-
-        for (i in e.clickedInventory!!.storageContents.indices) {
-            val item = e.clickedInventory!!.storageContents[i] ?: continue
-            if (isTool(item)) e.clickedInventory!!.setItem(i, removeDamage(item))
-            if (!ItemManager.getInstance().isItem(item) && isArmor(item)) e.clickedInventory!!.setItem(i, null)
+        if (isTool(e.currentItem)) {
+            e.currentItem = removeDamage(e.currentItem)
+        }
+        if (!ItemManager.getInstance().isItem(e.currentItem) && isArmor(e.currentItem)) {
+            e.currentItem = null
         }
     }
 
