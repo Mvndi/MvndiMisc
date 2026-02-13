@@ -2,20 +2,14 @@ package net.mvndicraft.mvndimisc
 
 import co.aikar.commands.PaperCommandManager
 import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.protocol.component.ComponentTypes
-import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
-import com.github.retrooper.packetevents.protocol.world.Location
-import com.github.retrooper.packetevents.resources.ResourceLocation
 import me.tofaa.entitylib.APIConfig
 import me.tofaa.entitylib.EntityLib
-import me.tofaa.entitylib.meta.display.ItemDisplayMeta
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform
-import me.tofaa.entitylib.wrapper.WrapperEntity
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
+import net.mvndicraft.mvndimisc.command.GamemodeSwitchCommand
+import net.mvndicraft.mvndimisc.command.SkyboxCommand
 import net.mvndicraft.mvndimmo.executors.blacksmith.AnvilExecutor
 import net.mvndicraft.mvndiplayers.PlayerManager
 import org.bukkit.Bukkit
@@ -46,15 +40,15 @@ import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.*
-import com.github.retrooper.packetevents.protocol.item.ItemStack as PEItemStack
 
 class MvndiMisc : JavaPlugin(), Listener {
 
     override fun onEnable() {
         // Plugin startup logic
         Bukkit.getServer().pluginManager.registerEvents(this, this)
-        PaperCommandManager(this).registerCommand(GamemodeSwitchCommand())
+        val cmdManager = PaperCommandManager(this)
+        cmdManager.registerCommand(GamemodeSwitchCommand())
+        cmdManager.registerCommand(SkyboxCommand())
 
         val platform = SpigotEntityLibPlatform(this)
         val settings = APIConfig(PacketEvents.getAPI()).tickTickables().tickTickables()
@@ -62,13 +56,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             .usePlatformLogger()
 
         EntityLib.init(platform, settings)
-
-        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, {
-            for (player in Bukkit.getOnlinePlayers()) {
-                val entity = playerEntities[player.uniqueId] ?: continue
-                entity.teleport(Location(player.location.x, player.location.y, player.location.z, 0f, 0f))
-            }
-        }, 1, UPDATE_TICKS.toLong())
+        createSkyboxThread(this)
     }
 
     override fun onDisable() {
@@ -340,36 +328,16 @@ class MvndiMisc : JavaPlugin(), Listener {
         }
     }
 
-    private val playerEntities: MutableMap<UUID, WrapperEntity> = HashMap()
-
-    companion object {
-        const val UPDATE_TICKS = 5 * 20
-    }
-
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
-        val entity = WrapperEntity(EntityTypes.ITEM_DISPLAY)
-        val meta = entity.entityMeta as ItemDisplayMeta
-
-        val builder = PEItemStack.builder()
-        builder.type(ItemTypes.DIAMOND_HOE)
-        builder.amount(1)
-        builder.component(ComponentTypes.ITEM_MODEL, ItemModel(ResourceLocation("shader_assets", "skybox")))
-        val skyboxItem = builder.build()
-
-        meta.item = skyboxItem
-
-        entity.spawn(Location(player.location.x, player.location.y, player.location.z, 0f, 0f))
-        entity.addViewer(PacketEvents.getAPI().playerManager.getUser(player))
-
-        playerEntities[player.uniqueId] = entity
+        if (getSkyboxSetting(player)) {
+            addSkybox(event.player)
+        }
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        val player = event.player
-        val entity = playerEntities.remove(player.uniqueId) ?: return
-        entity.remove()
+        removeSkybox(event.player)
     }
 }

@@ -1,4 +1,4 @@
-package net.mvndicraft.mvndimisc
+package net.mvndicraft.mvndimisc.command
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
