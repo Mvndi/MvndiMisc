@@ -44,12 +44,13 @@ fun createSkyboxThread(ctx: MvndiMisc) {
 }
 
 fun addSkybox(player: Player) {
+    val user = PacketEvents.getAPI().playerManager.getUser(player) ?: return
     val entity = WrapperEntity(EntityTypes.ITEM_DISPLAY)
     val meta = entity.entityMeta as ItemDisplayMeta
 
     meta.item = skyboxItem.copy()
     entity.spawn(Location(player.location.x, player.location.y, player.location.z, 0f, 0f))
-    entity.addViewer(PacketEvents.getAPI().playerManager.getUser(player))
+    entity.addViewer(user)
 
     playerEntities[player.uniqueId] = entity
 }
