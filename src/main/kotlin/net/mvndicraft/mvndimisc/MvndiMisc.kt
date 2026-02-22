@@ -259,21 +259,21 @@ class MvndiMisc : JavaPlugin(), Listener {
         e.isCancelled = true
     }
 
-    @EventHandler
-    fun dropArmorStandEquipment(e: EntityDeathEvent) {
-        val entity = e.entity
-        if (entity.type != EntityType.ARMOR_STAND || entity.isInvisible) return
-
-        val armorStand = entity as ArmorStand
-        EquipmentSlot.entries.forEach { equipmentSlot ->
-            try {
-                armorStand.world.dropItemNaturally(
-                    armorStand.location, armorStand.getItem(equipmentSlot)
-                )
-            } catch (ignore: Exception) {
-            }
-        }
-    }
+//    @EventHandler
+//    fun dropArmorStandEquipment(e: EntityDeathEvent) {
+//        val entity = e.entity
+//        if (entity.type != EntityType.ARMOR_STAND || entity.isInvisible) return
+//
+//        val armorStand = entity as ArmorStand
+//        EquipmentSlot.entries.forEach { equipmentSlot ->
+//            try {
+//                armorStand.world.dropItemNaturally(
+//                    armorStand.location, armorStand.getItem(equipmentSlot)
+//                )
+//            } catch (ignore: Exception) {
+//            }
+//        }
+//    }
 
     @EventHandler
     fun anvilCost(e: PrepareAnvilEvent) {
