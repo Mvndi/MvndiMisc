@@ -12,10 +12,7 @@ import net.mvndicraft.mvndimisc.command.GamemodeSwitchCommand
 import net.mvndicraft.mvndimisc.command.SkyboxCommand
 import net.mvndicraft.mvndimmo.executors.blacksmith.AnvilExecutor
 import net.mvndicraft.mvndiplayers.PlayerManager
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
@@ -25,11 +22,11 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
-import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -257,6 +254,14 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun nether(e: PortalCreateEvent) {
         e.isCancelled = true
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun respawn(e: PlayerRespawnEvent) {
+        // we have patch on Mvndi/molia to add respawn event but listeners that set the respawnLocation just dont actually make the player teleport there for some reason? but we need that patch anyway since without it this event wont fire at all and this listener wouldnt schedule the teleport (folia disables the paper event)
+        e.player.scheduler.runDelayed(this, {
+            e.player.teleportAsync(e.respawnLocation)
+        }, null, 2L)
     }
 
 //    @EventHandler
