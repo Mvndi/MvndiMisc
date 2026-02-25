@@ -235,23 +235,6 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun breedHorsesWithHay(event: PlayerInteractAtEntityEvent) {
-        val item = event.player.equipment.itemInMainHand
-        if (item.isEmpty || item.type != Material.HAY_BLOCK) return
-
-        val entity = event.rightClicked
-        if (!setOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE).contains(entity.type)) return
-
-        val abstractHorse = entity as AbstractHorse
-
-        if (!abstractHorse.canBreed()) return
-
-        abstractHorse.breedCause = event.player.uniqueId
-        abstractHorse.loveModeTicks = 20 * 10
-        item.subtract()
-    }
-
-    @EventHandler
     fun nether(e: PortalCreateEvent) {
         e.isCancelled = true
     }
