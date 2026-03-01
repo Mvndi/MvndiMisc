@@ -29,6 +29,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityTameEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -139,6 +140,15 @@ class MvndiMisc : JavaPlugin(), Listener {
         b.breakNaturally()
 
         if (horse) breakUnderHorse(b)
+    }
+
+    @EventHandler
+    fun disableTamedHorseAI(e: EntityTameEvent) {
+        val horse = e.entity
+        if (horse !is AbstractHorse)
+            return
+
+        horse.setAI(false)
     }
 
     @EventHandler
