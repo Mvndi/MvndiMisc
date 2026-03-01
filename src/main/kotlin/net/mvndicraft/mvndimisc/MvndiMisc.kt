@@ -21,12 +21,14 @@ import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -137,6 +139,28 @@ class MvndiMisc : JavaPlugin(), Listener {
         b.breakNaturally()
 
         if (horse) breakUnderHorse(b)
+    }
+
+    @EventHandler
+    fun noSpawnPvP(e: EntityDamageByEntityEvent) {
+        val damager = e.damager
+        val victim = e.entity
+
+        if (damager !is Player || victim !is Player) return
+
+        val world = damager.location.world ?: return
+        val spawn = world.spawnLocation
+
+        val spawnRadius = Bukkit.getSpawnRadius().toDouble()
+
+        val dx = damager.location.x - spawn.x
+        val dz = damager.location.z - spawn.z
+        val distanceSquared = dx * dx + dz * dz
+
+        if (distanceSquared <= spawnRadius * spawnRadius) {
+            e.isCancelled = true
+             damager.sendMessage("You cannot fight in spawn protection!")
+        }
     }
 
     @EventHandler
