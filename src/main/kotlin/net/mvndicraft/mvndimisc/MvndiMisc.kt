@@ -143,6 +143,12 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
+    fun afkBypass(e: PlayerKickEvent) {
+        if (e.cause == PlayerKickEvent.Cause.IDLING && e.player.hasPermission("group.mod"))
+            e.isCancelled = true
+    }
+
+    @EventHandler
     fun disableTamedHorseAI(e: EntityTameEvent) {
         val horse = e.entity
         if (horse !is AbstractHorse)
