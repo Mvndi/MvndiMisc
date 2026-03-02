@@ -26,6 +26,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPistonEvent
+import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -93,6 +95,12 @@ class MvndiMisc : JavaPlugin(), Listener {
             }
             event.isCancelled = false
         }
+    }
+
+    @EventHandler
+    fun onShulkerPiston(event: BlockPistonExtendEvent) {
+        if (event.block.location.world.getBlockAt(event.block.location.add(event.direction.direction)).type.toString().contains("SHULKER"))
+            event.isCancelled = true
     }
 
     @EventHandler
