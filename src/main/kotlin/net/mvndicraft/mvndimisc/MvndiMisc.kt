@@ -26,7 +26,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockPistonEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
@@ -163,6 +162,18 @@ class MvndiMisc : JavaPlugin(), Listener {
             return
 
         horse.setAI(false)
+    }
+
+    @EventHandler
+    fun allowHorseBreeding(e: PlayerInteractAtEntityEvent) {
+        val entity = e.rightClicked
+        if (entity !is AbstractHorse || !entity.isTamed)
+            return
+
+        entity.setAI(true)
+        entity.scheduler.runDelayed(this, {
+            entity.setAI(false)
+        }, null, 20L * 5)
     }
 
     @EventHandler
