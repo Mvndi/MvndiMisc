@@ -30,6 +30,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.entity.EntityTameEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
@@ -162,6 +163,12 @@ class MvndiMisc : JavaPlugin(), Listener {
             return
 
         horse.setAI(false)
+        horse.setGravity(true)
+    }
+
+    @EventHandler
+    fun horseGravity(e: EntityDismountEvent) { // why do horses with no ai have no gravity???
+        e.dismounted.setGravity(true)
     }
 
     @EventHandler
