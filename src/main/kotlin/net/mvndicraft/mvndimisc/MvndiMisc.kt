@@ -157,33 +157,6 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun disableTamedHorseAI(e: EntityTameEvent) {
-        val horse = e.entity
-        if (horse !is AbstractHorse)
-            return
-
-        horse.setAI(false)
-        horse.setGravity(true)
-    }
-
-    @EventHandler
-    fun horseGravity(e: EntityDismountEvent) { // why do horses with no ai have no gravity???
-        e.dismounted.setGravity(true)
-    }
-
-    @EventHandler
-    fun allowHorseBreeding(e: PlayerInteractAtEntityEvent) {
-        val entity = e.rightClicked
-        if (entity !is AbstractHorse || !entity.isTamed)
-            return
-
-        entity.setAI(true)
-        entity.scheduler.runDelayed(this, {
-            entity.setAI(false)
-        }, null, 20L * 5)
-    }
-
-    @EventHandler
     fun noSpawnPvP(e: EntityDamageByEntityEvent) {
         val damager = e.damager
         val victim = e.entity
