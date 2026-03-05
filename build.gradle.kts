@@ -63,6 +63,9 @@ tasks {
     build {
         dependsOn("shadowJar")
     }
+    assemble {
+        dependsOn("shadowJar")
+    }
 
     processResources {
         val props = mapOf(
