@@ -17,7 +17,6 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
-import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
@@ -28,14 +27,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockBurnEvent
-import org.bukkit.event.block.BlockIgniteEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.block.BlockSpreadEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDismountEvent
-import org.bukkit.event.entity.EntityTameEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -48,6 +44,10 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
 class MvndiMisc : JavaPlugin(), Listener {
+
+    companion object {
+        val SHELVES = setOf(Material.ACACIA_SHELF, Material.BAMBOO_SHELF, Material.BIRCH_SHELF, Material.CHERRY_SHELF, Material.CRIMSON_SHELF, Material.DARK_OAK_SHELF, Material.JUNGLE_SHELF, Material.MANGROVE_SHELF, Material.OAK_SHELF, Material.PALE_OAK_SHELF, Material.SPRUCE_SHELF, Material.WARPED_SHELF)
+    }
 
     override fun onEnable() {
         // Plugin startup logic
@@ -161,18 +161,18 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
     @EventHandler
     fun shelfBurn(e: BlockBurnEvent) {
-        if (e.block.type.toString().contains("SHELF"))
+        if (SHELVES.contains(e.block.type))
             e.isCancelled = true
     }
     @EventHandler
     fun shelfFire(e: BlockSpreadEvent) {
-        if (e.block.type.toString().contains("SHELF"))
+        if (SHELVES.contains(e.block.type))
             e.isCancelled = true
     }
 
     @EventHandler
     fun shelfInteract(e: PlayerInteractEvent) {
-        if (e.action == Action.RIGHT_CLICK_BLOCK && e.clickedBlock != null && e.clickedBlock?.type.toString().contains("SHELF"))
+        if (e.action == Action.RIGHT_CLICK_BLOCK && e.clickedBlock != null && SHELVES.contains(e.clickedBlock?.type))
             e.isCancelled = true
     }
 
