@@ -25,9 +25,13 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockBurnEvent
+import org.bukkit.event.block.BlockIgniteEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.BlockSpreadEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDismountEvent
@@ -153,6 +157,22 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler
     fun afkBypass(e: PlayerKickEvent) {
         if (e.cause == PlayerKickEvent.Cause.IDLING && e.player.hasPermission("group.mod"))
+            e.isCancelled = true
+    }
+    @EventHandler
+    fun shelfBurn(e: BlockBurnEvent) {
+        if (e.block.type.toString().contains("SHELF"))
+            e.isCancelled = true
+    }
+    @EventHandler
+    fun shelfFire(e: BlockSpreadEvent) {
+        if (e.block.type.toString().contains("SHELF"))
+            e.isCancelled = true
+    }
+
+    @EventHandler
+    fun shelfInteract(e: PlayerInteractEvent) {
+        if (e.action == Action.RIGHT_CLICK_BLOCK && e.clickedBlock != null && e.clickedBlock?.type.toString().contains("SHELF"))
             e.isCancelled = true
     }
 
