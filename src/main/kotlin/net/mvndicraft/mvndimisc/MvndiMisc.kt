@@ -17,6 +17,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.ShulkerBox
+import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
@@ -67,6 +68,17 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     override fun onDisable() {
         // Plugin shutdown logic
+    }
+
+    @EventHandler
+    fun onHorseDamage(event: EntityDamageByEntityEvent) {
+        val horse = event.entity
+        val player = event.damager
+        if (horse !is AbstractHorse || player !is Player)
+            return
+
+        if (player.vehicle == horse)
+            event.isCancelled = true
     }
 
     @EventHandler
