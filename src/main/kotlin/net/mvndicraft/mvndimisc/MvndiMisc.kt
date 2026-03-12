@@ -399,4 +399,12 @@ class MvndiMisc : JavaPlugin(), Listener {
     fun onPlayerQuit(event: PlayerQuitEvent) {
         removeSkybox(event.player)
     }
+
+    @EventHandler(ignoreCancelled = true)
+    fun onFish(event: PlayerFishEvent) {
+        if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            event.setCancelled(true);
+            event.getHook().remove();
+        }
+    }
 }
