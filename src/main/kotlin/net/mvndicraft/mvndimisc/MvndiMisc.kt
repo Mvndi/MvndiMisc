@@ -2,6 +2,7 @@ package net.mvndicraft.mvndimisc
 
 import co.aikar.commands.PaperCommandManager
 import com.github.retrooper.packetevents.PacketEvents
+import com.sun.swing.internal.plaf.metal.resources.metal
 import me.tofaa.entitylib.APIConfig
 import me.tofaa.entitylib.EntityLib
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform
@@ -22,6 +23,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
+import org.bukkit.entity.Shulker
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -42,7 +44,11 @@ import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.plugin.java.JavaPlugin
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
+import org.bukkit.event.player.PlayerJoinEvent;
+import java.util.Arrays
 
 class MvndiMisc : JavaPlugin(), Listener {
 
@@ -120,7 +126,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onBlockBreak(event: BlockBreakEvent) {
+    fun onShulkerBreak(event: BlockBreakEvent) {
         val block = event.block
         val blockstate = block.state
         val loc = block.location
@@ -132,6 +138,36 @@ class MvndiMisc : JavaPlugin(), Listener {
             }
             loc.world.dropItem(loc, ItemStack.of(block.type))
             event.isDropItems = false
+        }
+    }
+
+    @EventHandler
+    fun onPlayerChangeInventoryWithShulker(event: PlayerInventorySlotChangeEvent) {
+        removeItemFromShulkerInsidePlayerInventory(event.player)
+    }
+
+    @EventHandler
+    fun onPlayerJoinWithShulker(event: PlayerJoinEvent) {
+        removeItemFromShulkerInsidePlayerInventory(event.player)
+    }
+
+    fun removeItemFromShulkerInsidePlayerInventory(player: Player) {
+        for (i in 0 until player.inventory.size) {
+            val item = player.inventory.getItem(i)
+            if(item != null && item.type.toString().contains("SHULKER")) {
+                val meta = item.itemMeta
+
+                if (meta is BlockStateMeta) {
+                    val blockState = meta.blockState
+                    if (blockState is ShulkerBox) {
+                        val inventory = blockState.inventory
+                        if (!inventory.isEmpty()) {
+                            logger.info("SHULKER CLEANER: removed " + inventory.contents.size + " items from shulker of " + player.name + ": " + inventory.contents.contentToString())
+                            player.inventory.setItem(i, ItemStack(item.type))
+                        }
+                    }
+                }
+            }
         }
     }
 
