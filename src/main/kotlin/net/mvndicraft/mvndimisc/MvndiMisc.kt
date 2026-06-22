@@ -251,39 +251,47 @@ class MvndiMisc : JavaPlugin(), Listener {
         val p = e.player
 
         if (p.gameMode == GameMode.CREATIVE || p.gameMode == GameMode.SPECTATOR) return
-
-        val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
-        val b = p.location.subtract(0.0, 1.0, 0.0).block
-
-        if (!b.type.toString().lowercase().contains("ice")) return
+        if (!hasIceInRadius(p.location)) return
 
         val mPlayer = PlayerManager.getInstance().getPlayer(p.uniqueId) ?: return
-        val stats = mPlayer.stats
+        val equipLoadRatio = mPlayer.equipLoad / mPlayer.stats.equipLoad
+        val horse = p.vehicle?.let { it.type in listOf(EntityType.HORSE, EntityType.DONKEY, EntityType.MULE) } ?: false
 
-        if (horse && mPlayer.equipLoad / stats.equipLoad > 0.5 && Math.random() <= 0.5) breakUnderHorse(b)
-        else if (mPlayer.equipLoad / stats.equipLoad > 0.75 && Math.random() <= 0.5) {
-            b.breakNaturally()
-            b.location.world?.playSound(b.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
+        val shouldBreak = when {
+            horse -> equipLoadRatio > 0.5 && Math.random() <= 0.5
+            else -> equipLoadRatio > 0.75 && Math.random() <= 0.5
+        }
+
+        if (shouldBreak) breakIceInRadius(p.location)
+    }
+
+    private fun isIce(block: Block): Boolean = block.type.toString().lowercase().contains("ice")
+
+    private fun hasIceInRadius(location: Location, radius: Int = 3): Boolean {
+        val base = location.clone().subtract(0.0, 1.0, 0.0)
+        for (x in -radius..radius) for (z in -radius..radius) {
+            if (isIce(base.clone().add(x.toDouble(), 0.0, z.toDouble()).block)) return true
+        }
+        return false
+    }
+
+    private fun breakIceInRadius(location: Location, radius: Int = 3) {
+        val base = location.clone().subtract(0.0, 1.0, 0.0)
+        for (x in -radius..radius) for (z in -radius..radius) {
+            val block = base.clone().add(x.toDouble(), 0.0, z.toDouble()).block
+            if (!isIce(block)) continue
+            block.breakNaturally()
+            block.world.playSound(block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f)
         }
     }
 
-
     private fun breakUnderHorse(block: Block) {
-        if (block.type == Material.LILY_PAD || block.type.toString().lowercase().contains("ice")) block.breakNaturally()
+        if (block.type == Material.LILY_PAD) block.breakNaturally()
 
         for (x in -3..3) for (z in -3..3) {
             val targetBlock = block.location.clone().add(x.toDouble(), 0.0, z.toDouble()).block
-            if (targetBlock.type == Material.LILY_PAD || targetBlock.type.toString().lowercase()
-                    .contains("ice")
-            ) targetBlock.breakNaturally()
-            if (targetBlock.type.toString().lowercase().contains("ice")) targetBlock.world.playSound(
-                targetBlock.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f
-            )
+            if (targetBlock.type == Material.LILY_PAD) targetBlock.breakNaturally()
         }
-
-        if (block.type.toString().lowercase().contains("ice")) block.world.playSound(
-            block.location, Material.ICE.createBlockData().soundGroup.breakSound, 2f, 1f
-        )
     }
 
     @EventHandler
