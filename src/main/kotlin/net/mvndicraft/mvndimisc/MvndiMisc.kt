@@ -2,7 +2,6 @@ package net.mvndicraft.mvndimisc
 
 import co.aikar.commands.PaperCommandManager
 import com.github.retrooper.packetevents.PacketEvents
-import com.sun.swing.internal.plaf.metal.resources.metal
 import me.tofaa.entitylib.APIConfig
 import me.tofaa.entitylib.EntityLib
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform
@@ -23,7 +22,6 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
-import org.bukkit.entity.Shulker
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -48,7 +46,6 @@ import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.plugin.java.JavaPlugin
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
 import org.bukkit.event.player.PlayerJoinEvent;
-import java.util.Arrays
 
 class MvndiMisc : JavaPlugin(), Listener {
 
@@ -74,6 +71,13 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     override fun onDisable() {
         // Plugin shutdown logic
+    }
+
+    @EventHandler
+    fun onKelpGrow(event: BlockSpreadEvent) {
+        if (event.newState.type == Material.KELP_PLANT || event.newState.type == Material.KELP) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
