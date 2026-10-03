@@ -315,42 +315,39 @@ class MvndiMisc : JavaPlugin(), Listener {
         if (mvndiItem.type == Item.Type.WEAPON) e.isCancelled = true
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun armorStands(event: PlayerInteractAtEntityEvent) {
-        val entity = event.rightClicked
-        if (entity.type != EntityType.ARMOR_STAND) return
+        val armorStand = event.rightClicked as? ArmorStand ?: return
+        if (armorStand.isInvisible) return
 
-        val armorStand = entity as ArmorStand
-        if (!armorStand.isInvisible) {
-            armorStand.setArms(true)
-            var item = event.player.equipment.itemInMainHand
-            val empty = item.isEmpty
-            val offItem = event.player.equipment.itemInOffHand
-            if (empty) item = offItem
+        val item = event.player.inventory.getItem(event.hand)
+        if (item.isEmpty) return
 
-            if (item.isEmpty) return
-
-            if (item.type == Material.PLAYER_HEAD) {
-                val armorStandHead = armorStand.equipment.getItem(EquipmentSlot.HEAD)
-                if (!armorStandHead.isEmpty) armorStand.world.dropItemNaturally(armorStand.location, armorStandHead)
-
-                armorStand.equipment.setItem(EquipmentSlot.HEAD, item)
-                item.amount = 0
-                return
-            }
-
+        val slot = if (item.type == Material.PLAYER_HEAD) {
+            EquipmentSlot.HEAD
+        } else {
             val mvndiId = ItemManager.getInstance().getId(item) ?: return
             val mvndiItem = ItemManager.getInstance().getItem(mvndiId) ?: return
-
-            val slot =
-                if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) if (empty) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND else (mvndiItem as Armor).slot
-            val armorStandItem = armorStand.equipment.getItem(slot)
-
-            if (!armorStandItem.isEmpty) armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
-
-            armorStand.equipment.setItem(slot, item)
-            item.amount = 0
+            if (mvndiItem.type == Item.Type.WEAPON || mvndiItem.type == Item.Type.ITEM) {
+                if (event.hand == EquipmentSlot.OFF_HAND) EquipmentSlot.OFF_HAND else EquipmentSlot.HAND
+            } else {
+                (mvndiItem as Armor).slot
+            }
         }
+        val armorStandItem = armorStand.equipment.getItem(slot)
+
+        // Custom swaps bypass vanilla's manipulation event, where Towny checks claim permissions.
+        val swapEvent = PlayerArmorStandManipulateEvent(
+            event.player, armorStand, item.clone(), armorStandItem.clone(), slot, event.hand
+        )
+        server.pluginManager.callEvent(swapEvent)
+        event.isCancelled = true
+        if (swapEvent.isCancelled) return
+
+        armorStand.setArms(true)
+        if (!armorStandItem.isEmpty) armorStand.world.dropItemNaturally(armorStand.location, armorStandItem)
+        armorStand.equipment.setItem(slot, item)
+        item.amount = 0
     }
 
     @EventHandler
