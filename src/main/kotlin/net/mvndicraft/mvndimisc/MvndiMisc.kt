@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.PacketEvents
 import me.tofaa.entitylib.APIConfig
 import me.tofaa.entitylib.EntityLib
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform
+import net.mvndicraft.mvndicore.MvndiCore
 import net.mvndicraft.mvndiequipment.Armor
 import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
@@ -42,6 +43,7 @@ import org.bukkit.event.player.*
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.view.AnvilView
 import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.plugin.java.JavaPlugin
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent
@@ -50,6 +52,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 class MvndiMisc : JavaPlugin(), Listener {
 
     companion object {
+        private const val ANVIL_RENAME_PERMISSION = "mvndimisc.anvil.rename"
+        private const val ANVIL_RENAME_DENIED_MESSAGE = "misc.anvil.rename.denied"
         val SHELVES = setOf(Material.ACACIA_SHELF, Material.BAMBOO_SHELF, Material.BIRCH_SHELF, Material.CHERRY_SHELF, Material.CRIMSON_SHELF, Material.DARK_OAK_SHELF, Material.JUNGLE_SHELF, Material.MANGROVE_SHELF, Material.OAK_SHELF, Material.PALE_OAK_SHELF, Material.SPRUCE_SHELF, Material.WARPED_SHELF)
     }
 
@@ -379,9 +383,29 @@ class MvndiMisc : JavaPlugin(), Listener {
 //        }
 //    }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun anvilCost(e: PrepareAnvilEvent) {
         e.view.repairCost = 0
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun preventAnvilRename(e: InventoryClickEvent) {
+        val view: AnvilView = e.view as? AnvilView ?: return
+        if (e.rawSlot != 2 || e.whoClicked.hasPermission(ANVIL_RENAME_PERMISSION)) return
+        if (!changesAnvilName(view, e.currentItem)) return
+        val player: Player = e.whoClicked as? Player ?: return
+        e.isCancelled = true
+        // Inventory views must be closed after the click event finishes.
+        player.scheduler.run(this, {
+            player.closeInventory()
+            MvndiCore.messaging().error(player, ANVIL_RENAME_DENIED_MESSAGE)
+        }, null)
+    }
+
+    private fun changesAnvilName(view: AnvilView, result: ItemStack?): Boolean {
+        val input: ItemStack = view.topInventory.getItem(0) ?: return false
+        if (result == null || result.isEmpty) return false
+        return input.itemMeta.displayName() != result.itemMeta.displayName()
     }
 
     private val noDamageMod =

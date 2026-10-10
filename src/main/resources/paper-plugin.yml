@@ -6,6 +6,10 @@ authors: [ tlm920 ]
 description: Core plugin for minigame management on Mvndicraft
 website: mvndicraft.net
 folia-supported: true
+permissions:
+  mvndimisc.anvil.rename:
+    description: Allows adding, changing, or removing item names in an anvil
+    default: op
 dependencies:
   server:
     packetevents:
