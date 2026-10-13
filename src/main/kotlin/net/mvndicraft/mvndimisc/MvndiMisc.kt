@@ -133,7 +133,7 @@ class MvndiMisc : JavaPlugin(), Listener {
             event.isCancelled = true
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onShulkerBreak(event: BlockBreakEvent) {
         val block = event.block
         val blockstate = block.state
