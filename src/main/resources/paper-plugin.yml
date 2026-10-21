@@ -7,6 +7,9 @@ description: Core plugin for minigame management on Mvndicraft
 website: mvndicraft.net
 folia-supported: true
 permissions:
+  mvndimisc.anvil.color:
+    description: Allows colors and formatting when renaming items in an anvil
+    default: op
   mvndimisc.anvil.rename:
     description: Allows adding, changing, or removing item names in an anvil
     default: op

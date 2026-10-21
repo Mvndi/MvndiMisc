@@ -13,6 +13,8 @@ import net.mvndicraft.mvndimisc.command.GamemodeSwitchCommand
 import net.mvndicraft.mvndimisc.command.SkyboxCommand
 import net.mvndicraft.mvndimmo.executors.blacksmith.AnvilExecutor
 import net.mvndicraft.mvndiplayers.PlayerManager
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
@@ -53,6 +55,7 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     companion object {
         private const val ANVIL_RENAME_PERMISSION = "mvndimisc.anvil.rename"
+        private const val ANVIL_COLOR_PERMISSION = "mvndimisc.anvil.color"
         private const val ANVIL_RENAME_DENIED_MESSAGE = "misc.anvil.rename.denied"
         val SHELVES = setOf(Material.ACACIA_SHELF, Material.BAMBOO_SHELF, Material.BIRCH_SHELF, Material.CHERRY_SHELF, Material.CRIMSON_SHELF, Material.DARK_OAK_SHELF, Material.JUNGLE_SHELF, Material.MANGROVE_SHELF, Material.OAK_SHELF, Material.PALE_OAK_SHELF, Material.SPRUCE_SHELF, Material.WARPED_SHELF)
     }
@@ -386,6 +389,19 @@ class MvndiMisc : JavaPlugin(), Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun anvilCost(e: PrepareAnvilEvent) {
         e.view.repairCost = 0
+        if (!e.view.player.hasPermission(ANVIL_RENAME_PERMISSION)) return
+        val name: String = e.view.renameText ?: return
+        if (name.isBlank() || !changesAnvilName(e.view, e.result)) return
+        val result: ItemStack = e.result ?: return
+        val meta = result.itemMeta
+        val displayName: Component = if (e.view.player.hasPermission(ANVIL_COLOR_PERMISSION)) {
+            AnvilName.parse(name)
+        } else {
+            Component.text(name).decoration(TextDecoration.ITALIC, false)
+        }
+        meta.displayName(displayName)
+        result.itemMeta = meta
+        e.result = result
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
