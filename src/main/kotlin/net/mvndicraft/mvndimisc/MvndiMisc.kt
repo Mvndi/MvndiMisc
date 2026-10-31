@@ -54,6 +54,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 class MvndiMisc : JavaPlugin(), Listener {
 
     companion object {
+        private const val SPAWN_PVP_PROTECTION_ENABLED = "spawn-pvp-protection-enabled"
         private const val ANVIL_RENAME_PERMISSION = "mvndimisc.anvil.rename"
         private const val ANVIL_COLOR_PERMISSION = "mvndimisc.anvil.color"
         private const val ANVIL_RENAME_DENIED_MESSAGE = "misc.anvil.rename.denied"
@@ -61,6 +62,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     override fun onEnable() {
+        saveDefaultConfig()
         // Plugin startup logic
         Bukkit.getServer().pluginManager.registerEvents(this, this)
         val cmdManager = PaperCommandManager(this)
@@ -237,6 +239,9 @@ class MvndiMisc : JavaPlugin(), Listener {
 
     @EventHandler
     fun noSpawnPvP(e: EntityDamageByEntityEvent) {
+        if (!config.getBoolean(SPAWN_PVP_PROTECTION_ENABLED, true)) {
+            return
+        }
         val damager = e.damager
         val victim = e.entity
 
