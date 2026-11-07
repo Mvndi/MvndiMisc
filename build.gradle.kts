@@ -39,6 +39,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("litebans:api:0.6.1")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndicore:2.0.0-SNAPSHOT")
     compileOnly("net.mvndicraft:mvndiequipment:2.0.0-SNAPSHOT")
@@ -50,6 +51,9 @@ dependencies {
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("io.github.tofaa2:spigot:3.0.3-SNAPSHOT")
 
+    testImplementation("litebans:api:0.6.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.3")
+    testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.107.0")
 }

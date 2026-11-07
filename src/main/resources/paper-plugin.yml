@@ -15,6 +15,13 @@ permissions:
     default: op
 dependencies:
   server:
+    LiteBans:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    voicechat:
+      load: BEFORE
+      required: false
     packetevents:
       load: BEFORE
       required: true

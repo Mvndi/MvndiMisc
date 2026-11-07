@@ -11,6 +11,7 @@ import net.mvndicraft.mvndiequipment.Item
 import net.mvndicraft.mvndiequipment.ItemManager
 import net.mvndicraft.mvndimisc.command.GamemodeSwitchCommand
 import net.mvndicraft.mvndimisc.command.SkyboxCommand
+import net.mvndicraft.mvndimisc.voice.VoiceMuteSync
 import net.mvndicraft.mvndimmo.executors.blacksmith.AnvilExecutor
 import net.mvndicraft.mvndiplayers.PlayerManager
 import net.kyori.adventure.text.Component
@@ -54,6 +55,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 class MvndiMisc : JavaPlugin(), Listener {
 
     companion object {
+        private const val LITEBANS_PLUGIN = "LiteBans"
+        private const val VOICECHAT_PLUGIN = "voicechat"
         private const val SPAWN_PVP_PROTECTION_ENABLED = "spawn-pvp-protection-enabled"
         private const val ANVIL_RENAME_PERMISSION = "mvndimisc.anvil.rename"
         private const val ANVIL_COLOR_PERMISSION = "mvndimisc.anvil.color"
@@ -61,8 +64,13 @@ class MvndiMisc : JavaPlugin(), Listener {
         val SHELVES = setOf(Material.ACACIA_SHELF, Material.BAMBOO_SHELF, Material.BIRCH_SHELF, Material.CHERRY_SHELF, Material.CRIMSON_SHELF, Material.DARK_OAK_SHELF, Material.JUNGLE_SHELF, Material.MANGROVE_SHELF, Material.OAK_SHELF, Material.PALE_OAK_SHELF, Material.SPRUCE_SHELF, Material.WARPED_SHELF)
     }
 
+    private var voiceMuteSync: VoiceMuteSync? = null
+
     override fun onEnable() {
         saveDefaultConfig()
+        if (server.pluginManager.isPluginEnabled(LITEBANS_PLUGIN) && server.pluginManager.isPluginEnabled(VOICECHAT_PLUGIN)) {
+            voiceMuteSync = VoiceMuteSync(this).also { it.start() }
+        }
         // Plugin startup logic
         Bukkit.getServer().pluginManager.registerEvents(this, this)
         val cmdManager = PaperCommandManager(this)
@@ -79,7 +87,7 @@ class MvndiMisc : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
-        // Plugin shutdown logic
+        voiceMuteSync?.close()
     }
 
     @EventHandler
