@@ -55,6 +55,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 class MvndiMisc : JavaPlugin(), Listener {
 
     companion object {
+        private const val SKYBOX_ENABLED_KEY = "skybox-enabled"
         private const val LITEBANS_PLUGIN = "LiteBans"
         private const val VOICECHAT_PLUGIN = "voicechat"
         private const val SPAWN_PVP_PROTECTION_ENABLED = "spawn-pvp-protection-enabled"
@@ -63,6 +64,9 @@ class MvndiMisc : JavaPlugin(), Listener {
         private const val ANVIL_RENAME_DENIED_MESSAGE = "misc.anvil.rename.denied"
         val SHELVES = setOf(Material.ACACIA_SHELF, Material.BAMBOO_SHELF, Material.BIRCH_SHELF, Material.CHERRY_SHELF, Material.CRIMSON_SHELF, Material.DARK_OAK_SHELF, Material.JUNGLE_SHELF, Material.MANGROVE_SHELF, Material.OAK_SHELF, Material.PALE_OAK_SHELF, Material.SPRUCE_SHELF, Material.WARPED_SHELF)
     }
+
+    internal val isSkyboxEnabled: Boolean
+        get() = config.getBoolean(SKYBOX_ENABLED_KEY, true)
 
     private var voiceMuteSync: VoiceMuteSync? = null
 
@@ -75,7 +79,9 @@ class MvndiMisc : JavaPlugin(), Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, this)
         val cmdManager = PaperCommandManager(this)
         cmdManager.registerCommand(GamemodeSwitchCommand())
-        cmdManager.registerCommand(SkyboxCommand())
+        if (isSkyboxEnabled) {
+            cmdManager.registerCommand(SkyboxCommand())
+        }
 
         val platform = SpigotEntityLibPlatform(this)
         val settings = APIConfig(PacketEvents.getAPI()).tickTickables().tickTickables()
@@ -83,7 +89,9 @@ class MvndiMisc : JavaPlugin(), Listener {
             .usePlatformLogger()
 
         EntityLib.init(platform, settings)
-        createSkyboxThread(this)
+        if (isSkyboxEnabled) {
+            createSkyboxThread(this)
+        }
     }
 
     override fun onDisable() {

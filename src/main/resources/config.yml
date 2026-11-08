@@ -1,2 +1,3 @@
 spawn-pvp-protection-enabled: true
 voice-mute-sync-interval-seconds: 1
+skybox-enabled: true

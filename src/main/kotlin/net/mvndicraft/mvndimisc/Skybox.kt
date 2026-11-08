@@ -14,6 +14,7 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.HashMap
 import java.util.UUID
 
@@ -61,6 +62,9 @@ fun removeSkybox(player: Player) {
 }
 
 fun getSkyboxSetting(player: Player): Boolean {
+    if (!JavaPlugin.getPlugin(MvndiMisc::class.java).isSkyboxEnabled) {
+        return false
+    }
     return player.persistentDataContainer.get(skyboxDataKey, PersistentDataType.BOOLEAN) ?: true
 }
 
