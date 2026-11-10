@@ -483,7 +483,7 @@ class MvndiMisc : JavaPlugin(), Listener {
         e.inventory.setItem(0, item)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun removeToolDamageClickRemoveVanilaArmor(e: InventoryClickEvent) {
         if (e.clickedInventory == null || e.whoClicked.gameMode == GameMode.CREATIVE || e.whoClicked.gameMode == GameMode.SPECTATOR) return
         if (isTool(e.currentItem)) {
